@@ -20,8 +20,8 @@ filtered_jokes_df = jokes_df.drop(unrated_jokes)
 # model = SentenceTransformer('bert-base-cased')
 # model = SentenceTransformer('google-bert/bert-base-cased')
 # model = SentenceTransformer('Davlan/bert-base-multilingual-cased-finetuned-yoruba')
-model = SentenceTransformer('all-MiniLM-L6-v2')
-# model = SentenceTransformer('rithwik-db/bert-base-cased-10')
+# model = SentenceTransformer('all-MiniLM-L6-v2')
+model = SentenceTransformer('rithwik-db/bert-base-cased-10')
 
 
 # model.save('/bert-model')
@@ -96,7 +96,6 @@ mlp = MLPRegressor(max_iter=1, warm_start=True, random_state=42, solver='sgd', a
 
 # Variables to store loss curves
 train_loss = []
-val_loss = []
 train_loss_RMSE = []
 val_loss_RMSE = []
 
@@ -108,17 +107,25 @@ for epoch in range(epochs):
     y_pred_val = mlp.predict(X_val)
     rmse_train = mean_squared_error(y_train, y_pred_train, squared=False)
     rmse_val = mean_squared_error(y_val, y_pred_val, squared=False)
-    train_loss.append(rmse_train)
-    val_loss.append(rmse_val)
+    train_loss_RMSE.append(rmse_train)
+    val_loss_RMSE.append(rmse_val)
     train_loss.append(mlp.loss_)
-    val_loss.append(rmse_val)
     # print(f'Epoch {epoch + 1}/{epochs}, Training RMSE: {rmse_train}, Validation RMSE: {rmse_val}')
+
+# Plot both RMSE curves
+plt.plot(train_loss_RMSE, label='Training Loss')
+plt.plot(val_loss_RMSE, label='Validation Loss')
+plt.xlabel('Epochs')
+plt.ylabel('RMSE')
+plt.title('Training and Validation Loss Curves')
+plt.legend()
+plt.show()
 
 # Plot both loss curves
 plt.plot(train_loss, label='Training Loss')
-plt.plot(val_loss, label='Validation Loss')
+plt.plot(mlp.loss_curve_, label='Validation Loss')
 plt.xlabel('Epochs')
-plt.ylabel('RMSE')
+plt.ylabel('Loss')
 plt.title('Training and Validation Loss Curves')
 plt.legend()
 plt.show()
@@ -137,7 +144,7 @@ plt.show()
 
 
 ### Exercise 3: Investigate the Impact of Learning Rate
-learning_rates = [0.001, 0.01, 0.1, 0.5]
+learning_rates = [0.0001, 0.001, 0.01, 0.1]
 results_lr = []
 
 for lr in learning_rates:
@@ -168,7 +175,7 @@ plt.title('Validation RMSE for Different Learning Rates')
 plt.show()
 
 ### Exercise 4: Investigate the Impact of Model Size
-layer_sizes = [(50,), (100,), (100, 50), (50, 100, 50), (500,)]
+layer_sizes = [(50,), (100,), (100, 50), (50, 100, 50)]
 results_size = []
 
 for layers in layer_sizes:
