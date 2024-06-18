@@ -4,9 +4,12 @@ import numpy as np
 from sklearn.model_selection import train_test_split
 from sklearn.neural_network import MLPRegressor
 from sklearn.metrics import mean_squared_error
+from sklearn.model_selection import LearningCurveDisplay
 import matplotlib.pyplot as plt
 import seaborn as sns
 
+import warnings
+warnings.filterwarnings("ignore")
 
 # Load the joke texts
 # jokes_df = pd.read_csv('Dataset4JokeSet.csv', names=['joke'], encoding='1250', delimiter='\n')
@@ -56,7 +59,7 @@ ratings_melted['joke_id'] = ratings_melted['joke_id'].astype(int)
 ratings_melted = ratings_melted[ratings_melted['rating'] != 99]
 print(ratings_melted)
 
-# Merge BERT () embeddings with ratings
+# Merge BERT embeddings with ratings
 merged_df = pd.merge(ratings_melted, embeddings_df, left_on='joke_id', right_index=True)
 
 # print(merged_df)
@@ -65,13 +68,24 @@ merged_df = pd.merge(ratings_melted, embeddings_df, left_on='joke_id', right_ind
 X = merged_df.drop(['rated_jokes', 'joke_id', 'rating'], axis=1)
 y = merged_df['rating']
 
-
 # Split into training and validation sets
-X_train, X_val, y_train, y_val = train_test_split(X, y, test_size=0.2, random_state=42)
+X_train, X_val, y_train, y_val = train_test_split(X, y, test_size=0.2)
+
+
+
+
+
+
 
 
 # Train basic MLP model
 mlp = MLPRegressor(max_iter=200, random_state=42, solver='sgd', alpha=0.0, learning_rate='constant')
+
+
+
+plt.plot()
+
+
 mlp.fit(X_train, y_train)
 
 # Predict and calculate RMSE
@@ -117,7 +131,7 @@ plt.plot(train_loss_RMSE, label='Training Loss')
 plt.plot(val_loss_RMSE, label='Validation Loss')
 plt.xlabel('Epochs')
 plt.ylabel('RMSE')
-plt.title('Training and Validation Loss Curves')
+plt.title('Training and Validation RMSE Curves')
 plt.legend()
 plt.show()
 
